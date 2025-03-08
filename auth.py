@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
@@ -62,12 +62,12 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 @auth_router.post("/register", response_model=Token)
-def register(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(Admin).filter(Admin.email == user.email).first()
+def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
+    db_user = db.query(Student).filter(Student.email == user.email).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     hashed_password = get_password_hash(user.password)
-    new_user = Admin(
+    new_user = Student(
         username=user.username,
         email=user.email,
         password_hash=hashed_password,
@@ -83,11 +83,12 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     access_token = create_access_token(
         data={"sub": new_user.email}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    # return {"access_token": access_token, "token_type": "bearer"}
+    return {"message": "User registered successfully", "email": db_user.Email}
 
 @auth_router.post("/login", response_model=Token)
-def login(user: UserLogin, db: Session = Depends(get_db)):
-    db_user = db.query(Admin).filter(Admin.email == user.email).first()
+def login(request: Request, user: UserLogin, db: Session = Depends(get_db)):
+    db_user = db.query(Student).filter(Student.email == user.email).first()
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid email or password")
     if not verify_password(user.password, db_user.password_hash):

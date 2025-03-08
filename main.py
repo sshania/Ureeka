@@ -1,21 +1,26 @@
 from fastapi import FastAPI
+from auth import auth_router as auth_router
+from course import course_router as course_router
+from material import material_router as material_router
+from answer import answer_router as answer_router
 
 app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello"}
+    return {"message": "Hello Guys. Welcome to the API"}
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: str = None):
     return {"item_id": item_id, "query": q}
 
 
-# contoh: ( buat jadiin satu pas beda file gitu)
-# app.include_router(auth_router, prefix="/auth")
-# app.include_router(dashboard_router, prefix="/dashboard")
-# app.include_router(product_router, prefix="/product")
-# app.include_router(superadmin_router, prefix="/superadmin")
+# Routing > (buat jadiin satu pas beda file gitu) 
+app.include_router(auth_router, prefix="/auth")
+app.include_router(course_router, prefix="/course")
+app.include_router(material_router, prefix="/material")
+app.include_router(answer_router, prefix="/answer")
+
 
 # Apply Middleware
 # app.middleware("https")(log_requests)
