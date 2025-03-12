@@ -3,6 +3,8 @@ from auth import auth_router as auth_router
 from course import course_router as course_router
 from material import material_router as material_router
 from answer import answer_router as answer_router
+from quiz import quiz_router as quiz_router
+from forum import forum_router as forum_router
 
 app = FastAPI()
 
@@ -20,6 +22,10 @@ app.include_router(auth_router, prefix="/auth")
 app.include_router(course_router, prefix="/course")
 app.include_router(material_router, prefix="/material")
 app.include_router(answer_router, prefix="/answer")
+app.include_router(quiz_router, prefix="/quiz")
+app.include_router(forum_router, prefix="/forum")
+
+
 
 
 # Apply Middleware

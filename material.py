@@ -47,7 +47,7 @@ class MaterialOut(BaseModel):
 @material_router.post("/create/{course_id}", response_model=MaterialOut, status_code=status.HTTP_201_CREATED)
 def create_material(material: MaterialCreate, db: Session = Depends(get_db)):
 
-    course = db.query(Courses).filter(Courses.course_id == material.course_id).first()
+    course = db.query(Course).filter(Course.course_id == material.course_id).first()
     if not course:
         raise HTTPException(status_code=400, detail="Course ID tidak ditemukan")
     
