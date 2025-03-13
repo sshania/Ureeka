@@ -114,19 +114,20 @@ def get_test(test_id: int, db: Session = Depends(get_db)):
 
 @quiz_router.put("/test/update/{test_id}", response_model=TestOut)
 def update_test(test_id: int, test: TestUpdate, db: Session = Depends(get_db)):
-    test = db.query(Tests).filter(Tests.test_id == test_id).first()
-    if test is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Test not found")
-    test.course_id = test.course_id
-    test.test_id = test.test_id
-    test.title = test.title
-    test.description = test.description
-    test.pass_percentage = test.pass_percentage
-    test.time_limit = test.time_limit
-    test.admin_id = test.admin_id
+    db_test = db.query(Tests).filter(Tests.test_id == test_id).first()
+    if not db_test:
+        raise HTTPException(status_code=404, detail="Test not found")
+    
+    db_test.course_id = test.course_id
+    db_test.title = test.title
+    db_test.description = test.description
+    db_test.pass_percentage = test.pass_percentage
+    db_test.time_limit = test.time_limit
+    db_test.admin_id = test.admin_id
+    
     db.commit()
-    db.refresh(test)
-    return test
+    db.refresh(db_test)
+    return db_test
 
 @quiz_router.delete("/test/delete/{test_id}", response_model=TestOut)
 def delete_test(test_id: int, db: Session = Depends(get_db)):
@@ -153,19 +154,16 @@ def get_question(test_id: int, question_id: int, db: Session = Depends(get_db)):
     return question
 
 @quiz_router.put("/question/update/{test_id}/{question_id}", response_model=QuestionOut)
-def update_question(test_id: int, question_id: int, question: QuestionUpdate, db: Session = Depends(get_db)):
-    question = db.query(Questions).filter(Questions.test_id == test_id, Questions.question_id == question_id).first()
-    if question is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Question not found")
-    question.test_id = question.test_id
-    question.question_id = question.question_id
-    question.question = question.question
-    question.question_type = question.question_type
-    question.marks = question.marks
-    question.admin_id = question.admin_id
+def update_question(question_id: int, question: QuestionUpdate, db: Session = Depends(get_db)):
+    db_question = db.query(Questions).filter(Questions.question_id == question_id).first()
+    if not db_question:
+        raise HTTPException(status_code=404, detail="Question not found")
+    
+    db_question.test_id = question.test_id
+    db_question.text = question.text
     db.commit()
-    db.refresh(question)
-    return question
+    db.refresh(db_question)
+    return db_question
 
 @quiz_router.delete("/question/delete/{test_id}/{question_id}", response_model=QuestionOut)
 def delete_question(test_id: int, question_id: int, db: Session = Depends(get_db)):
@@ -192,18 +190,18 @@ def get_answer(test_id: int, question_id: int, answer_id: int, db: Session = Dep
     return answer
 
 @quiz_router.put("/answer/update/{test_id}/{question_id}/{answer_id}", response_model=AnswerOut)
-def update_answer(test_id: int, question_id: int, answer_id: int, answer: AnswerUpdate, db: Session = Depends(get_db)):
-    answer = db.query(Answers).filter(Answers.question_id == question_id, Answers.answer_id == answer_id).first()
-    if answer is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Answer not found")
-    answer.question_id = answer.question_id
-    answer.answer_id = answer.answer_id
-    answer.answer = answer.answer
-    answer.is_correct = answer.is_correct
-    answer.admin_id = answer.admin_id
+def update_answer(answer_id: int, answer: AnswerUpdate, db: Session = Depends(get_db)):
+    db_answer = db.query(Answers).filter(Answers.answer_id == answer_id).first()
+    if not db_answer:
+        raise HTTPException(status_code=404, detail="Answer not found")
+    
+    db_answer.question_id = answer.question_id
+    db_answer.text = answer.text
+    db_answer.is_correct = answer.is_correct
+    
     db.commit()
-    db.refresh(answer)
-    return answer
+    db.refresh(db_answer)
+    return db_answer
 
 @quiz_router.delete("/answer/delete/{test_id}/{question_id}/{answer_id}", response_model=AnswerOut)
 def delete_answer(test_id: int, question_id: int, answer_id: int, db: Session = Depends(get_db)):
