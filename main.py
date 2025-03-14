@@ -6,6 +6,7 @@ from answer import answer_router as answer_router
 from quiz import quiz_router as quiz_router
 from forum import forum_router as forum_router
 from testAttempt import testAttempt_router as testAttempt_router
+from home import home_router as home_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -31,12 +32,14 @@ def read_root():
 # app.include_router(testAttempt_router, prefix="/testAttempt")
 
 app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
+app.include_router(home_router, prefix="/home", tags=["Home"])
 app.include_router(course_router, prefix="/course", tags=["Courses"])
 app.include_router(material_router, prefix="/material", tags=["Materials"])
 app.include_router(answer_router, prefix="/answer", tags=["Answers"])
 app.include_router(quiz_router, prefix="/quiz", tags=["Quizzes"])
 app.include_router(forum_router, prefix="/forum", tags=["Forum"])
 app.include_router(testAttempt_router, prefix="/testAttempt", tags=["Test Attempts"])
+
 
 
 # Apply Middleware
