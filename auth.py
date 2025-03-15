@@ -75,7 +75,8 @@ def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
         first_name=user.first_name,
         last_name=user.last_name,
         created_at=datetime.utcnow(),
-        is_active=True
+        is_active=True,
+        join_date = datetime.utcnow()
     )
     
     db.add(new_user)
