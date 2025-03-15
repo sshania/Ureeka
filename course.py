@@ -44,7 +44,7 @@ class CourseOut(BaseModel):
         orm_mode: True        
 
 # create
-@course_router.post("/create/", response_model=CourseOut, status_code=status.HTTP_201_CREATED)
+@course_router.post("/create/{admin_id}", response_model=CourseOut, status_code=status.HTTP_201_CREATED)
 def create_course(course: CourseCreate, db: Session = Depends(get_db)):
     new_course = Course(
         title=course.title,
