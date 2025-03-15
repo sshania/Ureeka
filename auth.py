@@ -66,6 +66,7 @@ def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(Student).filter(Student.email == user.email).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
+    
     hashed_password = get_password_hash(user.password)
     new_user = Student(
         username=user.username,
@@ -76,15 +77,17 @@ def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
         created_at=datetime.utcnow(),
         is_active=True
     )
+    
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": new_user.email}, expires_delta=access_token_expires
     )
-    # return {"access_token": access_token, "token_type": "bearer"}
-    return {"message": "User registered successfully", "email": db_user.Email}
+
+    return {"access_token": access_token, "token_type": "bearer"}
 
 @auth_router.post("/login", response_model=Token)
 def login(request: Request, user: UserLogin, db: Session = Depends(get_db)):
