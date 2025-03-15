@@ -85,20 +85,23 @@ def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": new_user.email}, expires_delta=access_token_expires
+        data={"sub": new_user.username}, expires_delta=access_token_expires
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
 
 @auth_router.post("/login", response_model=Token)
 def login(request: Request, user: UserLogin, db: Session = Depends(get_db)):
-    db_user = db.query(Student).filter(Student.email == user.email).first()
+
+    print("User data received:", user.dict())
+    
+    db_user = db.query(Student).filter(Student.username == user.username).first()
     if not db_user:
-        raise HTTPException(status_code=400, detail="Invalid email or password")
+        raise HTTPException(status_code=400, detail="Invalid username or password")
     if not verify_password(user.password, db_user.password_hash):
-        raise HTTPException(status_code=400, detail="Invalid email or password")
+        raise HTTPException(status_code=400, detail="Invalid username or password")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": db_user.email}, expires_delta=access_token_expires
+        data={"sub": db_user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
